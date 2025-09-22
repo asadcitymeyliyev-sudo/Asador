@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express";import cors from "cors";
 import bodyParser from "body-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 
 const SECRET_KEY = "supersecretkey"; // меняй на свой секрет
-const app = express();
+const app = express();app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 

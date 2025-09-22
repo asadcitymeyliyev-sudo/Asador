@@ -1,62 +1,16 @@
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyApp</title>
-  <link rel="manifest" href="/manifest.json">
-</head>	
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyApp</title>
-
-  <!-- Подключение manifest.json -->
-  <link rel="manifest" href="/manifest.json">
-
-  <!-- Цвет для статус-бара -->
-  <meta name="theme-color" content="#0000FF">
-</head>
-<body>
-  <h1>Добро пожаловать в MyApp!</h1>
-  <p>Это тестовый экран моего PWA 🚀</p>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyApp</title>
-
-  <!-- подключаем манифест -->
-  <link rel="manifest" href="/manifest.json">
-
-  <!-- иконка -->
-  <link rel="icon" href="/icons/icon-192x192.png">
-</head>
-<body>
-  <h1>Привет, это мой PWA!</h1>
-</body>
-</html>
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(() => console.log("✅ Service Worker registered"))
-      .catch(err => console.log("❌ Service Worker failed", err));
-  }
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asador App</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/ic_launcher.png">
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
   form { margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; max-width: 400px; }
   input { display: block; width: 100%; padding: 8px; margin: 8px 0; }
-  button { padding: 10px 20px; }
+  button { padding: 10px 20px; cursor: pointer; }
   #message { margin-top: 10px; font-weight: bold; }
 </style>
 </head>
@@ -81,45 +35,45 @@
 <div id="message"></div>
 
 <script>
-const BASE_URL = "https://asador-com.onrender.com";
+  const BASE_URL = "https://asador-1v5v.onrender.com";
 
-const registerForm = document.getElementById("registerForm");
-const loginForm = document.getElementById("loginForm");
-const messageDiv = document.getElementById("message");
+  const registerForm = document.getElementById("registerForm");
+  const loginForm = document.getElementById("loginForm");
+  const messageDiv = document.getElementById("message");
 
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const username = document.getElementById("regUsername").value;
-  const password = document.getElementById("regPassword").value;
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = document.getElementById("regUsername").value;
+    const password = document.getElementById("regPassword").value;
 
-  const res = await fetch(BASE_URL + "/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    const res = await fetch(BASE_URL + "/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    messageDiv.textContent = data.message || data.error;
   });
 
-  const data = await res.json();
-  messageDiv.textContent = data.message || data.error;
-});
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
 
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const username = document.getElementById("loginUsername").value;
-  const password = document.getElementById("loginPassword").value;
+    const res = await fetch(BASE_URL + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
 
-  const res = await fetch(BASE_URL + "/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    const data = await res.json();
+    if (data.token) {
+      messageDiv.textContent = "Login successful! Token: " + data.token;
+    } else {
+      messageDiv.textContent = data.error;
+    }
   });
-
-  const data = await res.json();
-  if (data.token) {
-    messageDiv.textContent = "Login successful! Token: " + data.token;
-  } else {
-    messageDiv.textContent = data.error;
-  }
-});
 </script>
 
 </body>
