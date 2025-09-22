@@ -1,0 +1,5 @@
+node_modules/
+android-ndk-r26b/
+mydb.sqlite
+*.zip
+*.save
