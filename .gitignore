@@ -3,3 +3,4 @@ android-ndk-r26b/
 mydb.sqlite
 *.zip
 *.save
+.vercel
