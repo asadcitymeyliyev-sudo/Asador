@@ -1,36 +1,4 @@
 {
-  "name": "MyApp",
-  "short_name": "MyApp",
-  "description": "Проект MyApp",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#FFA500",
-  "theme_color": "#FFA500",
-  "icons": [
-    {
-      "src": "/ic_launcher.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
-{
-  "name": "Waiving Mani",
-  "short_name": "Waiving",
-  "description": "Filter through notifications as and when you need!",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#FFA500",
-  "theme_color": "#FFA500",
-  "icons": [
-    {
-      "src": "/ic_launcher.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
-{
   "name": "Моё Приложение",
   "short_name": "App",
   "start_url": ".",
