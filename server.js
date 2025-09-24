@@ -1,80 +1,48 @@
-// server.js
 import express from "express";
-import bodyParser from "body-parser";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import initSqlJs from "sql.js";
 import fs from "fs";
 import path from "path";
-import cors from "cors";
+import bodyParser from "body-parser";
 
-const SECRET_KEY = "supersecretkey";
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
+const USERS_FILE = "./users.json";
 
-// Подключаем CORS
-app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(process.cwd(), "public")));
 
-// Подключаем body-parser
-app.use(bodyParser.json());
-
-// Статическая папка для HTML/CSS/JS
-app.use(express.static("public"));
-
-// Инициализация базы данных SQLite
-let SQL;
-let db;
-initSqlJs().then(SQLLib => {
-  SQL = SQLLib;
-  const dbFile = path.join("./", "mydb.sqlite");
-  if (fs.existsSync(dbFile)) {
-    const fileBuffer = fs.readFileSync(dbFile);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-    db.run("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)");
-    fs.writeFileSync(dbFile, Buffer.from(db.export()));
-  }
-});
-
-// Сохранение базы
-function saveDb() {
-  const data = db.export();
-  fs.writeFileSync(path.join("./", "mydb.sqlite"), Buffer.from(data));
-}
-
-// Регистрация
+// --- Регистрация ---
 app.post("/register", (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.json({ error: "Username and password required" });
+  if (!username || !password) return res.send("Введите имя и пароль!");
 
-  const hashed = bcrypt.hashSync(password, 10);
-
-  try {
-    db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashed]);
-    saveDb();
-    res.json({ message: "User created" });
-  } catch (err) {
-    res.json({ error: "Username already exists" });
+  let users = [];
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
   }
+
+  if (users.find(u => u.username === username)) {
+    return res.send("Пользователь уже существует!");
+  }
+
+  users.push({ username, password });
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  res.send("✅ Успешно зарегистрировано! Можете войти.");
 });
 
-// Логин
+// --- Вход ---
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.json({ error: "Username and password required" });
+  if (!username || !password) return res.send("Введите имя и пароль!");
 
-  const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
-  stmt.bind([username]);
-  if (!stmt.step()) return res.json({ error: "User not found" });
+  let users = [];
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+  }
 
-  const user = stmt.getAsObject();
-  const match = bcrypt.compareSync(password, user.password);
-  if (!match) return res.json({ error: "Invalid password" });
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) return res.send("Неверный логин или пароль!");
 
-  const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: "1h" });
-  res.json({ token });
+  res.send(`✅ Привет, ${username}! Вы успешно вошли.`);
 });
 
-// Запуск сервера
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
